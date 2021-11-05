@@ -1,14 +1,8 @@
-# Project
+# Medical Imaging with Azure Machine Learning Demos 
 
-> This repo has been populated by an initial template to help get you started. Please
-> make sure to update the content to build a great experience for community-building.
-
-As the maintainer of this project, please make a few updates:
-
-- Improving this README.MD file to provide a great experience
-- Updating SUPPORT.MD with content about this project's support experience
-- Understanding the security reporting process in SECURITY.MD
-- Remove this section from the README
+Welcome to our medical imaging demo repository! The content includes several Python notebooks that cover medical imaging use cases based on classification, object detection and instance segmentation.
+All use cases are based on publicly available datasets like brain RMI scans, cell micrographs, chest x-ray images and more. Since we cannot distribute the data directly, we refer to publicly available download links.
+The purpose of our notebooks is to demonstrate how Azure Machine Learning can be used to support medical imaging and other use cases in areas like dataset and model management, deployment, experiment tracking and explainability. Furthermore, we include manual model development approaches as well as automated machine learning for images. Another focus is to provide MLOPS focused examples for automating the machine learning lifecycle for medical use cases including retraining when new data becomes available.
 
 ## Contributing
 
