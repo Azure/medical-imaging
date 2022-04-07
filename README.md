@@ -1,4 +1,4 @@
-> **Disclaimer**:  
+> **Disclaimer**  
 This code is provided for research and development use only. This code is not intended for use in clinical decision-making or for any other clinical use and the performance of the code for clinical use has not been established.
 
 # Medical Imaging with Azure Machine Learning Demos 
