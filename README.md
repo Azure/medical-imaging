@@ -1,3 +1,5 @@
+> **Disclaimer**: This code is provided for research and development use only. This code is not intended for use in clinical decision-making or for any other clinical use and the performance of the code for clinical use has not been established.
+
 # Medical Imaging with Azure Machine Learning Demos 
 
 Welcome to our medical imaging demo repository! The content includes several Python notebooks that cover medical imaging use cases based on classification, object detection and instance segmentation.
