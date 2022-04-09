@@ -1,3 +1,4 @@
+# livecell version
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 from matplotlib.lines import Line2D
@@ -34,8 +35,8 @@ def get_image_segmentations(aks_service, img_path):
 def generate_jsonl_annotations(source, target_path, annotation_file):
     annotations = []
     # delete annotation flie if it exists
-    with open(annotation_file, 'w') as fp:
-        fp.close()
+    if os.path.exists(annotation_file):
+        os.remove(annotation_file)
 
     # loop through images
     for img_idx, image in enumerate(source['images']):
@@ -50,14 +51,14 @@ def generate_jsonl_annotations(source, target_path, annotation_file):
         class_name = file_name.split('_')[0]
         
         image_dict = {
-            "image_url" : target_path + '/' + class_name + '/' + file_name,
+            "image_url" : target_path + '/' + file_name,
             "image_details" : {
                 "format" : extension,
                 "width" : width,
                 "height" : height },
             "label" : []
         }
-        
+       
         # get all annotations for current image
         image_annotations = [annotation for annotation in source['annotations'] if annotation['image_id'] == id]
         
@@ -117,7 +118,8 @@ def plot_ground_truth_boxes(image_file, ground_truth_boxes):
     ax2.imshow(img_np, cmap='gray')
     ax2.axis("off")
 
-    fig.suptitle(ground_truth_boxes[0]["label"])
+    class_label = 'Cell type ' + ground_truth_boxes[0]["label"] + ' :'
+    fig.suptitle(class_label)
 
     for gt in ground_truth_boxes:
         label = gt["label"]
@@ -144,6 +146,7 @@ def plot_ground_truth_boxes(image_file, ground_truth_boxes):
 
         ax2.add_line(poly_line)
 
+    plt.tight_layout()
     plt.show()
 
 def plot_ground_truth_boxes_jsonl(image_file, jsonl_file):
@@ -169,7 +172,7 @@ def plot_ground_truth_boxes_dataset(image_file, dataset_pd):
     else:
         print("Unable to find ground truth information for image: {}".format(image_file))
 
-def plot_predicted_segmentations(sample_image, jsonl_file, resp):
+def plot_predicted_segmentations(sample_image, resp, jsonl_file = "", min_conf_score = 0.6):
 
     # IMAGE_SIZE = (18,20)
     plt.figure()
@@ -182,7 +185,10 @@ def plot_predicted_segmentations(sample_image, jsonl_file, resp):
     # # Display the image
     # ax.imshow(img_np, cmap='gray')
 
-    fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(20, 8))
+    if jsonl_file != "":
+        fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(20, 8))
+    else:
+        fig, (ax1, ax3) = plt.subplots(1, 2, figsize=(20, 8))
     fig.tight_layout()
     fig.subplots_adjust(top=0.95)
 
@@ -190,77 +196,81 @@ def plot_predicted_segmentations(sample_image, jsonl_file, resp):
     ax1.title.set_text('Original image')
     ax1.axis("off")
 
-    ax2.imshow(img_np, cmap='gray')
-    ax2.title.set_text('Ground truth segmentations')
-    ax2.axis("off")
+    # draw box and label for each detection 
+    detections = json.loads(resp.text)
+    labels = [detect['label'] for detect in detections['boxes']]
+    print (len(labels), 'segmentations predicted')
+    # print(labels)
+
+    if jsonl_file != "":
+        ax2.imshow(img_np, cmap='gray')
+        ax2.title.set_text('Ground truth segmentations')
+        ax2.axis("off")
+
+        image_base_name = os.path.basename(sample_image)
+        ground_truth_data_found = False
+        with open(jsonl_file) as fp:
+            for line in fp.readlines():
+                line_json = json.loads(line)
+                # print(line_json)
+                filename = line_json["image_url"]
+                if image_base_name in filename:
+                    ground_truth_data_found = True
+                    ground_truth_boxes = line_json["label"]
+                    break
+        if not ground_truth_data_found:
+            print("Unable to find ground truth information for image: {}".format(sample_image))
+
+        class_label = 'Ground truth cell type ' + ground_truth_boxes[0]["label"] + ' :'
+        fig.suptitle(class_label)
+
+        for gt in ground_truth_boxes:
+            label = gt["label"]
+            polygon = gt['polygon']
+
+            # plt.text(topleft_x, topleft_y - 10, label, color=color, fontsize=20)
+
+            # xmin, ymin, xmax, ymax =  gt["topX"], gt["topY"], gt["bottomX"], gt["bottomY"]
+            # topleft_x, topleft_y = img_w * xmin, img_h * ymin
+            # width, height = img_w * (xmax - xmin), img_h * (ymax - ymin)
+
+            color = 'mediumseagreen'
+
+            polygon_np = np.array(polygon[0])
+            polygon_np = polygon_np.reshape(-1, 2)
+            polygon_np[:, 0] *= x
+            polygon_np[:, 1] *= y
+            poly = patches.Polygon(polygon_np, True, facecolor=color, alpha=0.4)
+            ax2.add_patch(poly)
+            poly_line = Line2D(polygon_np[:, 0], polygon_np[:, 1], linewidth=1, color='white')
+                            #    marker='o', markersize=1, markerfacecolor='white')
+
+            ax2.add_line(poly_line)
+
 
     ax3.imshow(img_np, cmap='gray')
     ax3.title.set_text('Predicted segmentations')
     ax3.axis("off")
-
-
-    # draw box and label for each detection 
-    detections = json.loads(resp.text)
-    labels = [detect['label'] for detect in detections['boxes']]
-    # print(labels)
-
-    image_base_name = os.path.basename(sample_image)
-    ground_truth_data_found = False
-    with open(jsonl_file) as fp:
-        for line in fp.readlines():
-            line_json = json.loads(line)
-            # print(line_json)
-            filename = line_json["image_url"]
-            if image_base_name in filename:
-                ground_truth_data_found = True
-                ground_truth_boxes = line_json["label"]
-                break
-    if not ground_truth_data_found:
-        print("Unable to find ground truth information for image: {}".format(image_file))
-
-    fig.suptitle(ground_truth_boxes[0]["label"])
-
-    for gt in ground_truth_boxes:
-        label = gt["label"]
-        polygon = gt['polygon']
-
-        # plt.text(topleft_x, topleft_y - 10, label, color=color, fontsize=20)
-
-        # xmin, ymin, xmax, ymax =  gt["topX"], gt["topY"], gt["bottomX"], gt["bottomY"]
-        # topleft_x, topleft_y = img_w * xmin, img_h * ymin
-        # width, height = img_w * (xmax - xmin), img_h * (ymax - ymin)
-
-        color = 'mediumseagreen'
-
-        polygon_np = np.array(polygon[0])
-        polygon_np = polygon_np.reshape(-1, 2)
-        polygon_np[:, 0] *= x
-        polygon_np[:, 1] *= y
-        poly = patches.Polygon(polygon_np, True, facecolor=color, alpha=0.4)
-        ax2.add_patch(poly)
-        poly_line = Line2D(polygon_np[:, 0], polygon_np[:, 1], linewidth=1, color='white')
-                        #    marker='o', markersize=1, markerfacecolor='white')
-
-        ax2.add_line(poly_line)
 
     for detect in detections['boxes']:
         label = detect['label']
         box = detect['box']
         polygon = detect['polygon']
         conf_score = detect['score']
-        if conf_score > 0.6:
+        if conf_score > min_conf_score:
+            # print("label found")
             ymin, xmin, ymax, xmax =  box['topY'],box['topX'], box['bottomY'],box['bottomX']
             topleft_x, topleft_y = x * xmin, y * ymin
             width, height = x * (xmax - xmin), y * (ymax - ymin)
             # print('{}: [{}, {}, {}, {}], {}'.format(detect['label'], round(topleft_x, 3), 
-            #                                         round(topleft_y, 3), round(width, 3), 
-            #                                         round(height, 3), round(conf_score, 3)))
+            #                                        round(topleft_y, 3), round(width, 3), 
+            #                                        round(height, 3), round(conf_score, 3)))
 
             color = 'mediumseagreen'
             # rect = patches.Rectangle((topleft_x, topleft_y), width, height, 
             #                         linewidth=2, edgecolor=color,facecolor='none')
 
-            # ax.add_patch(rect)
+            # ax3.add_patch(rect)
             # plt.text(topleft_x, topleft_y - 10, label, color='black', fontsize=10)
             
             polygon_np = np.array(polygon[0])
