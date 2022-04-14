@@ -1,0 +1,13 @@
+channels:
+- conda-forge
+dependencies:
+- python=3.6.2
+- pip:
+  - azureml-defaults
+  - torch==1.6.0
+  - torchvision==0.7.0
+  - future==0.17.1
+  - pillow
+  - scikit-learn
+  - matplotlib>=3.3
+  - azureml-mlflow
