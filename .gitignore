@@ -131,3 +131,18 @@ dmypy.json
 # AzureML Notebook
 *.amltmp 
 *.amltemp
+
+# nvflare artifacts
+log.txt
+client_token.txt
+*.fl
+audit.log
+transfer
+
+# virtual environments
+nvflare_cifar10
+
+# data
+dataset
+dataset*
+*results*
