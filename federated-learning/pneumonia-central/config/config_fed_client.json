@@ -40,7 +40,7 @@
                 "events_to_convert": [
                     "analytix_log_stats"
                 ],
-                "dataset_name": "chest-xray-full",
+                "dataset_name": "pneumonia-central",
                 "fed_event_prefix": "fed."
             }
         }
