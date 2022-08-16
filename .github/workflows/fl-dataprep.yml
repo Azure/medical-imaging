@@ -1,0 +1,83 @@
+name: FL data preperation
+
+on:
+  workflow_dispatch:
+    inputs:
+      resource_group:
+        description: 'Resource group name'
+        required: true
+        default: 'fedlearn' 
+        type: string
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out repo
+      uses: actions/checkout@main
+    - name: Install az ml extension
+      run: az extension add -n ml -y
+    - name: Azure login
+      uses: azure/login@v1
+      with:
+        creds: ${{secrets.AZURE_CREDENTIALS}}
+    - name: Provision resources
+      run: |
+        clients=( europe asia us)
+        export KAGGLE_USERNAME=harmke
+        export KAGGLE_KEY=c257d0bf050ae4ced8812c8495a4630d
+
+        az configure --defaults group="${{ github.event.inputs.resource_group }}"
+
+        # Download the Pneumonia dataset
+        pip install kaggle
+        pip install split-folders
+        kaggle datasets download -d paultimothymooney/chest-xray-pneumonia -p /tmp
+        unzip -q /tmp/chest-xray-pneumonia.zip -d /tmp
+
+        # split in train, val and test
+        splitfolders --output /tmp/chest_xray_tvt/ --ratio .8 .1 .1 --seed 33 --move -- /tmp/chest_xray/train
+
+        # store central dataset to asia hospital
+        az ml data create --workspace-name Asia-Hospital \
+                          --name pneumonia-central \
+                          --path /tmp/chest_xray_tvt \
+                          --type uri_folder
+
+        stages=( train test val )
+        classes=( PNEUMONIA NORMAL)
+
+        # Create folders
+        for client in "${clients[@]}"; do
+            mkdir /tmp/chest_xray_$client
+            for stage in "${stages[@]}"; do
+                mkdir /tmp/chest_xray_$client/$stage
+                for class in "${classes[@]}"; do
+                    mkdir /tmp/chest_xray_$client/$stage/$class
+                done
+            done
+        done
+
+        # Copy data to client folders
+        i=0
+        for file in $(find /tmp/chest_xray_tvt -name '*.jpeg'); do
+            classnr=$(( i % 3 ))
+            cp $file ${file/chest_xray_tvt/chest_xray_${clients[classnr]}}
+            i=$((i+1))
+        done
+
+        #Upload data assets
+        az ml data create --workspace-name Asia-Hospital \
+                          --name pneumonia-dataset \
+                          --path /tmp/chest_xray_asia \
+                          --type uri_folder
+
+        az ml data create --workspace-name Europe-Hospital \
+                          --name pneumonia-dataset \
+                          --path /tmp/chest_xray_europe \
+                          --type uri_folder
+
+        az ml data create --workspace-name US-Hospital \
+                          --name pneumonia-dataset \
+                          --path /tmp/chest_xray_us \
+                          --type uri_folder
