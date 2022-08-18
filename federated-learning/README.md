@@ -57,13 +57,12 @@ provision -p project.yml
 As mentioned, the clients will be implemented through different Azure Machine Learning Workspaces in different regions. In this step, we are creating the workspaces and create Compute Instances within it. 
 The Compute Instances will be configured as a client and initiate communication with the federated server.
 
-For every client, repeat the following steps. Make sure to use a different region for the different Workspaces to simulate a global setup:
+For every client, repeat the following steps:
 - Access the workspace via the Azure Machine Learning Studio on https://ml.azure.com.
-- Create Compute Instance by going to Compute -> Compute Instances and click on *new*.
-- Install NVFlare library via pip: `pip install nvflare`
-- We need the prepare the dataset.
+- Access the Compute Instance that was created in the workspace by open up a terminal that is connected to it on the *Notebooks*-page of the workspace.
+- Using the terminal, install NVFlare library via pip: `pip install nvflare`
 - Copy one of the site packages that is generated on the federated server to the filesystem connected to your Machine Learning Workspace. One approach for this is to go to Notebooks in the Azure Machine Learning Studio, click on the *plus*-icon, and select *Upload folder*.
-- From the Machine Learning Studio, open a new Terminal (also on the Notebooks page) connected the Compute Instance you created. Navigate to the startup folder of the client package that you uploaded, and run the start script using the following command: `bash ./start.sh`.
+- Using the terminal, Navigate to the startup folder of the client package that you uploaded, and run the start script using the following command: `bash ./start.sh`.
 
 ## 5. Run the experiment
 In this step, we use the admin client of our federated application to upload the training code to the different clients and start the training run.
