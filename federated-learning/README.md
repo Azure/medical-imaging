@@ -27,9 +27,10 @@ az group create -n fedlearn
                               --sdk-auth
 ```
 - Create a GitHub secret in your repository. Name it AZURE_CREDENTIALS and copy and paste the output of the service principal to the Value field of the secret.
-
-- Create another secret in your repository, with the name VM_PASSWORD. As a value, enter the password you would like to use for accessing the VM.
-
+- Additionally, add the following secrets to your repository with corresponding values:
+  - VM_PASSWORD: the password you would like to use for accessing the VM.
+  - KAGGLE_USERNAME: your Kaggle username.
+  - kAGGLE_PASSWORD: your Kaggle API key. More info [here](https://www.kaggle.com/docs/api).
 - Navigate to the GitHub Actions tab, and run the workflow with the name *FL provision resources*. If your resource group has a different name then 'fedlearn', change the name of the workflow variable accordingly. This will create a VM, 3 Machine Learning Workspaces and Compute Instances to your resource group.
 
 - Run the GitHub Actions workflow with the name *FL data preperation*. This will register the datasets required for your experiment in your workspace.
