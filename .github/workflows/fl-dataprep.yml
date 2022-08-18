@@ -24,8 +24,8 @@ jobs:
     - name: Provision resources
       run: |
         clients=( europe asia us)
-        export KAGGLE_USERNAME=harmke
-        export KAGGLE_KEY=c257d0bf050ae4ced8812c8495a4630d
+        export KAGGLE_USERNAME=${{ secrets.KAGGLE_USERNAME }}
+        export KAGGLE_KEY=${{ secrets.KAGGLE_PASSWORD }}
 
         az configure --defaults group="${{ github.event.inputs.resource_group }}"
 
