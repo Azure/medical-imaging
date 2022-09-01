@@ -48,11 +48,12 @@ provision -p project.yml
 ```
 - Create two new folders on VM in home dir: fedserver and fedadmin
 - Copy server and admin packages to these folders
-- Run start script in fedserver folder
 - Run the following command to open the host file or your VM: `sudo vi /etc/hosts`
 - Press *i* to start insering content in your host file
 - Create a new entry on line 2 using this pattern: `<private-ip-of-vm> <dns-address>` (the private IP address of your VM can be found by accessing your VM in the Azure portal and in the Overview, look for Networking -> Private IP address)
-
+- Press *ESC*, followed by *:wq*, follwed by *enter* to close the editor
+- Navigate to the fedserver folder, which should be located in the VM home directory. From there, navigate to the startup folder.
+- Run `bash start.sh` to run the federated server
 
 ## 4. Prepare clients
 As mentioned, the clients will be implemented through different Azure Machine Learning Workspaces in different regions. In this step, we are creating the workspaces and create Compute Instances within it. 
