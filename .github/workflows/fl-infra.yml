@@ -29,7 +29,7 @@ jobs:
         az vm create -n fedserver --image microsoft-dsvm:ubuntu-1804:1804-gen2:latest --authentication-type password --public-ip-address-dns-name ${{ github.event.inputs.resource_group }} \
         --admin-password ${{ secrets.VM_PASSWORD }}
 
-        az vm open-port -n clivm --port 8002-8003 --priority 100
+        az vm open-port -n fedserver --port 8002-8003 --priority 100
 
         az ml workspace create -n Asia-Hospital --location eastasia
         az ml compute create --type ComputeInstance --name FedClientAsia$RANDOMQUALIFIER --workspace-name Asia-Hospital
