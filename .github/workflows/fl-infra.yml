@@ -38,4 +38,4 @@ jobs:
         az ml compute create --type ComputeInstance --name FedClientEurope$RANDOMQUALIFIER --workspace-name Europe-Hospital
 
         az ml workspace create -n US-Hospital --location eastus
-        az ml compute create --type ComputeInstance --name FedClientAsia$RANDOMQUALIFIER --workspace-name US-Hospital
+        az ml compute create --type ComputeInstance --name FedClientUS$RANDOMQUALIFIER --workspace-name US-Hospital
