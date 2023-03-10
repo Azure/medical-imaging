@@ -129,8 +129,12 @@ dmypy.json
 .pyre/
 
 # AzureML Notebook
-*.amltmp 
+.amlignore
+.amlignore.*
 *.amltemp
+*.amltmp 
+.ipynb_aml_checkpoints/
+
 
 # nvflare artifacts
 log.txt
