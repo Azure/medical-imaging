@@ -6,7 +6,7 @@ on:
       resource_group:
         description: 'Resource group name'
         required: true
-        default: 'fedlearn' 
+        default: 'rg-medical-imaging-rafl' 
         type: string
 
 jobs:
