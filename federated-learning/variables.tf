@@ -1,7 +1,7 @@
 # Input Variables
 variable "resource_group_name" {
   type    = string
-  default = "rg-medical-imaging-test-rafl"
+  default = "rg-medical-imaging-rafl"
 }
 variable "contact" {
   type    = string
@@ -26,5 +26,5 @@ variable "location" {
 variable "prefix" {
   type        = string
   description = "Prefix of the resource name"
-  default     = "ml"
+  default     = "rafl"
 }

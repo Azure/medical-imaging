@@ -6,9 +6,10 @@ provider "azurerm" {
 
 # Dependent resources for Azure Machine Learning
 resource "azurerm_application_insights" "default" {
-  name                = "${random_pet.prefix.id}-appi"
-  location            = azurerm_resource_group.default.location
-  resource_group_name = azurerm_resource_group.default.name
+  count = 3
+  name                = "medical-imaging-rafl-appi${count.index}"
+  location            = var.location
+  resource_group_name = var.resource_group_name
   application_type    = "web"
   tags = {
     contact  = var.contact
@@ -17,9 +18,10 @@ resource "azurerm_application_insights" "default" {
 }
 
 resource "azurerm_key_vault" "default" {
-  name                     = "${var.prefix}${var.environment}${random_integer.suffix.result}kv"
-  location                 = azurerm_resource_group.default.location
-  resource_group_name      = azurerm_resource_group.default.name
+  count = 3
+  name                     = "${var.prefix}${var.environment}${random_integer.suffix.result}kv${count.index}"
+  location                 = var.location
+  resource_group_name      = var.resource_group_name
   tenant_id                = data.azurerm_client_config.current.tenant_id
   sku_name                 = "premium"
   purge_protection_enabled = false
@@ -30,9 +32,10 @@ resource "azurerm_key_vault" "default" {
 }
 
 resource "azurerm_storage_account" "default" {
-  name                            = "${var.prefix}${var.environment}${random_integer.suffix.result}st"
-  location                        = azurerm_resource_group.default.location
-  resource_group_name             = azurerm_resource_group.default.name
+  count = 3
+  name                            = "${var.prefix}${var.environment}${random_integer.suffix.result}st${count.index}"
+  location                        = var.location
+  resource_group_name             = var.resource_group_name
   account_tier                    = "Standard"
   account_replication_type        = "GRS"
   allow_nested_items_to_be_public = false
@@ -43,9 +46,10 @@ resource "azurerm_storage_account" "default" {
 }
 
 resource "azurerm_container_registry" "default" {
-  name                = "${var.prefix}${var.environment}${random_integer.suffix.result}cr"
-  location            = azurerm_resource_group.default.location
-  resource_group_name = azurerm_resource_group.default.name
+  count = 3
+  name                = "${var.prefix}${var.environment}${random_integer.suffix.result}cr${count.index}"
+  location            = var.location
+  resource_group_name = var.resource_group_name
   sku                 = "Premium"
   admin_enabled       = true
   tags = {
@@ -56,13 +60,14 @@ resource "azurerm_container_registry" "default" {
 
 # Machine Learning workspace
 resource "azurerm_machine_learning_workspace" "default" {
-  name                          = "${random_pet.prefix.id}-mlw"
-  location                      = azurerm_resource_group.default.location
-  resource_group_name           = azurerm_resource_group.default.name
-  application_insights_id       = azurerm_application_insights.default.id
-  key_vault_id                  = azurerm_key_vault.default.id
-  storage_account_id            = azurerm_storage_account.default.id
-  container_registry_id         = azurerm_container_registry.default.id
+  count = 3
+  name                          = "medical-imaging-rafl-mlw${count.index}"
+  location                      = var.location
+  resource_group_name           = var.resource_group_name
+  application_insights_id       = azurerm_application_insights.default[count.index].id
+  key_vault_id                  = azurerm_key_vault.default[count.index].id
+  storage_account_id            = azurerm_storage_account.default[count.index].id
+  container_registry_id         = azurerm_container_registry.default[count.index].id
   public_network_access_enabled = true
   tags = {
     contact  = var.contact
@@ -71,5 +76,23 @@ resource "azurerm_machine_learning_workspace" "default" {
 
   identity {
     type = "SystemAssigned"
+  }
+}
+
+#compute instances
+resource "azurerm_machine_learning_compute_instance" "example" {
+  count = 3
+  name                          = "medical-imaging-rafl-compute-instances${count.index}"
+  location                      = var.location
+  machine_learning_workspace_id = "medical-imaging-rafl-mlw${count.index}"
+  virtual_machine_size          = "STANDARD_DS2_V2"
+  authorization_type            = "personal"
+  ssh {
+    public_key = var.ssh_key
+  }
+  subnet_resource_id = azurerm_subnet.example.id
+  description        = "foo"
+  tags = {
+    foo = "bar"
   }
 }
