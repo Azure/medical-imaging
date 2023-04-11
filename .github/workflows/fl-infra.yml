@@ -37,7 +37,7 @@ jobs:
         
         echo "step 3"
 
-        az network create -n Asia-Hospital --location westeurope --resource-group rg-medical-imaging-rafl
+        az ml workspace create -g rg-medical-imaging-rafl -n Asia-Hospital --location westeurope
         echo "step4"
         az ml compute create --type ComputeInstance --name FedClientAsia$RANDOMQUALIFIER --workspace-name Asia-Hospital --resource-group rg-medical-imaging-rafl
         echo "step5"
