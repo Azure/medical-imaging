@@ -28,3 +28,8 @@ variable "prefix" {
   description = "Prefix of the resource name"
   default     = "ml"
 }
+
+variable "hospital_name" {
+  type    = string
+  default = "central_hospital_aicha"
+}

@@ -6,7 +6,8 @@ provider "azurerm" {
 
 # Dependent resources for Azure Machine Learning
 resource "azurerm_application_insights" "default" {
-  name                = "${random_pet.prefix.id}-appi"
+  count               = 3
+  name                = "${random_pet.prefix.id}-appi${count.index}"
   location            = azurerm_resource_group.default.location
   resource_group_name = azurerm_resource_group.default.name
   application_type    = "web"
@@ -17,7 +18,8 @@ resource "azurerm_application_insights" "default" {
 }
 
 resource "azurerm_key_vault" "default" {
-  name                     = "${var.prefix}${var.environment}${random_integer.suffix.result}kv"
+  count                    = 3
+  name                     = "${var.prefix}${var.environment}${random_integer.suffix.result}kv${count.index}"
   location                 = azurerm_resource_group.default.location
   resource_group_name      = azurerm_resource_group.default.name
   tenant_id                = data.azurerm_client_config.current.tenant_id
@@ -30,7 +32,8 @@ resource "azurerm_key_vault" "default" {
 }
 
 resource "azurerm_storage_account" "default" {
-  name                            = "${var.prefix}${var.environment}${random_integer.suffix.result}st"
+  count                           = 3
+  name                            = "${var.prefix}${var.environment}${random_integer.suffix.result}st${count.index}"
   location                        = azurerm_resource_group.default.location
   resource_group_name             = azurerm_resource_group.default.name
   account_tier                    = "Standard"
@@ -43,7 +46,8 @@ resource "azurerm_storage_account" "default" {
 }
 
 resource "azurerm_container_registry" "default" {
-  name                = "${var.prefix}${var.environment}${random_integer.suffix.result}cr"
+  count               = 3
+  name                = "${var.prefix}${var.environment}${random_integer.suffix.result}cr${count.index}"
   location            = azurerm_resource_group.default.location
   resource_group_name = azurerm_resource_group.default.name
   sku                 = "Premium"
@@ -56,13 +60,14 @@ resource "azurerm_container_registry" "default" {
 
 # Machine Learning workspace
 resource "azurerm_machine_learning_workspace" "default" {
-  name                          = "${random_pet.prefix.id}-mlw"
+  count                         = 3
+  name                          = "${random_pet.prefix.id}-mlw${count.index}"
   location                      = azurerm_resource_group.default.location
   resource_group_name           = azurerm_resource_group.default.name
-  application_insights_id       = azurerm_application_insights.default.id
-  key_vault_id                  = azurerm_key_vault.default.id
-  storage_account_id            = azurerm_storage_account.default.id
-  container_registry_id         = azurerm_container_registry.default.id
+  application_insights_id       = azurerm_application_insights.default[count.index].id
+  key_vault_id                  = azurerm_key_vault.default[count.index].id
+  storage_account_id            = azurerm_storage_account.default[count.index].id
+  container_registry_id         = azurerm_container_registry.default[count.index].id
   public_network_access_enabled = true
   tags = {
     contact  = var.contact

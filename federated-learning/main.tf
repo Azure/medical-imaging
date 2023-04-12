@@ -1,7 +1,7 @@
 data "azurerm_client_config" "current" {}
 
 resource "azurerm_resource_group" "default" {
-  name     = "${random_pet.prefix.id}-rg"
+  name     = "${var.hospital_name}-rg"
   location = var.location
   tags = {
     contact  = var.contact
