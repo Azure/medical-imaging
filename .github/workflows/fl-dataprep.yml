@@ -6,7 +6,7 @@ on:
       resource_group:
         description: 'Resource group name'
         required: true
-        default: 'fedlearn' 
+        default: 'rg-medical-imaging-rafl' 
         type: string
 
 jobs:
@@ -39,7 +39,7 @@ jobs:
         splitfolders --output /tmp/chest_xray_tvt/ --ratio .8 .1 .1 --seed 33 --move -- /tmp/chest_xray/train
 
         # store central dataset to asia hospital
-        az ml data create --workspace-name Asia-Hospital \
+        az ml data create --workspace-name medical-imaging-rafl-mlw0 \
                           --name pneumonia-central \
                           --path /tmp/chest_xray_tvt \
                           --type uri_folder
@@ -67,17 +67,17 @@ jobs:
         done
 
         #Upload data assets
-        az ml data create --workspace-name Asia-Hospital \
+        az ml data create --workspace-name medical-imaging-rafl-mlw0 \
                           --name pneumonia-dataset \
                           --path /tmp/chest_xray_asia \
                           --type uri_folder
 
-        az ml data create --workspace-name Europe-Hospital \
+        az ml data create --workspace-name medical-imaging-rafl-mlw1 \
                           --name pneumonia-dataset \
                           --path /tmp/chest_xray_europe \
                           --type uri_folder
 
-        az ml data create --workspace-name US-Hospital \
+        az ml data create --workspace-name medical-imaging-rafl-mlw2 \
                           --name pneumonia-dataset \
                           --path /tmp/chest_xray_us \
                           --type uri_folder
