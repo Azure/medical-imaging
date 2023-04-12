@@ -92,3 +92,36 @@ On the federated clients, training metrics are streamed to the server that can b
 ## 6. Clean up resources
 
 - Delete your resource group by using the following command: `az group delete -g <resource-group-name>`.
+
+
+  az ad sp create-for-rbac --name "rg-medical-imaging-rafl-sp" --role contributor \
+                              --scopes /subscriptions/29a20b09-0857-4fda-b790-62666cbb1f13/resourceGroups/rg-medical-imaging-rafl \
+                              --sdk-auth
+
+{
+  "clientId": "cce90a89-a970-48cf-99ad-9bb953c61056",
+  "clientSecret": "Ix68Q~02mgMOxgQQPNDXEJzndOhS3n6psurTSdc4",
+  "subscriptionId": "29a20b09-0857-4fda-b790-62666cbb1f13",
+  "tenantId": "5d4df24d-6769-4586-9455-dd6db3f30f0e",
+  "activeDirectoryEndpointUrl": "https://login.microsoftonline.com",
+  "resourceManagerEndpointUrl": "https://management.azure.com/",
+  "activeDirectoryGraphResourceId": "https://graph.windows.net/",
+  "sqlManagementEndpointUrl": "https://management.core.windows.net:8443/",
+  "galleryEndpointUrl": "https://gallery.azure.com/",
+  "managementEndpointUrl": "https://management.core.windows.net/"
+}
+
+az vm create -n fedserver --image microsoft-dsvm:ubuntu-1804:1804-gen2:latest --authentication-type password --public-ip-address-dns-name rg-medical-imaging-rafl \
+        --admin-password VM_password123!
+
+{
+  "fqdns": "rg-medical-imaging-rafl.westeurope.cloudapp.azure.com",
+  "id": "/subscriptions/29a20b09-0857-4fda-b790-62666cbb1f13/resourceGroups/rg-medical-imaging-rafl/providers/Microsoft.Compute/virtualMachines/fedserver",
+  "location": "westeurope",
+  "macAddress": "60-45-BD-88-6C-F8",
+  "powerState": "VM running",
+  "privateIpAddress": "10.0.0.4",
+  "publicIpAddress": "20.4.34.216",
+  "resourceGroup": "rg-medical-imaging-rafl",
+  "zones": ""
+}
